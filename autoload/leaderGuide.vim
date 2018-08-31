@@ -477,6 +477,14 @@ function! leaderGuide#start_by_prefix(vis, key) " {{{
 endfunction " }}}
 function! leaderGuide#start(vis, dict) " {{{
     let s:vis = a:vis ? 'gv' : 0
+    let s:count = v:count != 0 ? v:count : ''
+
+    if has('nvim') && !exists('s:reg')
+        let s:reg = ''
+    else
+        let s:reg = v:register != s:get_register() ? '"'.v:register : ''
+    endif
+
     let s:lmap = a:dict
     call s:start_buffer()
 endfunction " }}}
