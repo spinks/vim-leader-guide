@@ -214,6 +214,11 @@ let s:displaynames = {'<C-I>': '<Tab>',
 function! s:calc_layout() " {{{
     let ret = {}
     let smap = filter(copy(s:lmap), 'v:key !=# "name"')
+    for key in keys(smap)
+        if type(smap[key]) == type([]) && smap[key][1] == "leader_ignore"
+            unlet smap[key]
+        endif
+    endfor
     let ret.n_items = len(smap)
     let length = values(map(smap, 
                 \ 'strdisplaywidth("[".v:key."]".'.
@@ -245,7 +250,11 @@ function! s:create_string(layout) " {{{
     let col = 0
     let smap = sort(filter(keys(s:lmap), 'v:val !=# "name"'),'1')
     for k in smap
+        silent execute "cnoremap <nowait> <buffer> ".substitute(k, "|", "<Bar>", ""). " " . s:escape_keys(k) ."<CR>"
         let desc = type(s:lmap[k]) == type({}) ? s:lmap[k].name : s:lmap[k][1]
+        if desc == "leader_ignore"
+            continue
+        endif
         let displaystring = "[".s:show_displayname(k)."] ".desc
         let crow = get(rows, row, [])
         if empty(crow)
@@ -274,7 +283,6 @@ function! s:create_string(layout) " {{{
                 let col += 1
             endif
         endif
-        silent execute "cnoremap <nowait> <buffer> ".substitute(k, "|", "<Bar>", ""). " " . s:escape_keys(k) ."<CR>"
     endfor
     let r = []
     let mlen = 0
