@@ -332,6 +332,9 @@ function! s:handle_input(input) " {{{
     else
         call feedkeys(s:vis.s:reg.s:count, 'ti')
         redraw
+        if (type(a:input) == type(0)) && a:input == 0
+          return
+        endif 
         try
             unsilent execute a:input[0]
         catch
