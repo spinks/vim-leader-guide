@@ -301,11 +301,11 @@ function! s:create_string(layout) " {{{
 endfunction " }}}
 
 
-function! s:start_buffer() " {{{
+function! s:start_buffer(StatusString) " {{{
     let s:winv = winsaveview()
     let s:winnr = winnr()
     let s:winres = winrestcmd()
-    call s:winopen()
+    call s:winopen(a:StatusString)
     let layout = s:calc_layout()
     let string = s:create_string(layout)
 
@@ -328,7 +328,7 @@ function! s:handle_input(input) " {{{
     call s:winclose()
     if type(a:input) ==? type({})
         let s:lmap = a:input
-        call s:start_buffer()
+        call s:start_buffer(a:input['name'])
     else
         call feedkeys(s:vis.s:reg.s:count, 'ti')
         redraw
@@ -354,7 +354,7 @@ function! s:wait_for_input() " {{{
         call s:handle_input(fsel)
     endif
 endfunction " }}}
-function! s:winopen() " {{{
+function! s:winopen(StatusString) " {{{
     if !exists('s:bufnr')
         let s:bufnr = -1
     endif
@@ -381,7 +381,8 @@ function! s:winopen() " {{{
     setlocal nobuflisted buftype=nofile bufhidden=unload noswapfile
     setlocal nocursorline nocursorcolumn colorcolumn=
     setlocal winfixwidth winfixheight
-    setlocal statusline=\ Leader\ Guide
+    let g:LeaderGuideStatusString = "\  ".a:StatusString " has to be global variable throws error otherwise
+    setlocal statusline=%{g:LeaderGuideStatusString}
 endfunction " }}}
 function! s:winclose() " {{{
     noautocmd execute s:gwin.'wincmd w'
@@ -473,7 +474,7 @@ function! leaderGuide#start_by_prefix(vis, key) " {{{
     endif
     let s:lmap = rundict
 
-    call s:start_buffer()
+    call s:start_buffer('Leader Guide')
 endfunction " }}}
 function! leaderGuide#start(vis, dict) " {{{
     let s:vis = a:vis ? 'gv' : 0
@@ -486,7 +487,7 @@ function! leaderGuide#start(vis, dict) " {{{
     endif
 
     let s:lmap = a:dict
-    call s:start_buffer()
+    call s:start_buffer('Leader Guide')
 endfunction " }}}
 
 let &cpo = s:save_cpo
