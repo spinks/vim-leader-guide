@@ -381,8 +381,8 @@ function! s:winopen(StatusString) " {{{
     setlocal nobuflisted buftype=nofile bufhidden=unload noswapfile
     setlocal nocursorline nocursorcolumn colorcolumn=
     setlocal winfixwidth winfixheight
-    let g:LeaderGuideStatusString = "\  ".a:StatusString " has to be global variable throws error otherwise
-    setlocal statusline=%{g:LeaderGuideStatusString}
+    let g:leaderGuide_status_string = "\  ".a:StatusString
+    setlocal statusline=%{g:leaderGuide_status_string}
 endfunction " }}}
 function! s:winclose() " {{{
     noautocmd execute s:gwin.'wincmd w'
@@ -487,7 +487,7 @@ function! leaderGuide#start(vis, dict) " {{{
     endif
 
     let s:lmap = a:dict
-    call s:start_buffer('Leader Guide')
+    call s:start_buffer("Leader Guide")
 endfunction " }}}
 
 let &cpo = s:save_cpo
