@@ -222,7 +222,9 @@ function! s:calc_layout() " {{{
     let ret.n_items = len(smap)
     let length = values(map(smap, 
                 \ 'strdisplaywidth("[".v:key."]".'.
-                \ '(type(v:val) == type({}) ? v:val["name"] : v:val[1]))'))
+                \ '(type(v:val) == type({}) ?'.
+                \ '(g:leaderGuide_display_plus_menus ? v:val["name"]."s" : v:val["name"])'.
+                \ ': v:val[1]))'))
     let maxlength = max(length) + g:leaderGuide_hspace
     if g:leaderGuide_vertical
         let ret.n_rows = winheight(0) - 2
@@ -255,7 +257,7 @@ function! s:create_string(layout) " {{{
         if desc == "leader_ignore"
             continue
         endif
-        let displaystring = "[".s:show_displayname(k)."] ".desc
+        let displaystring = "[".s:show_displayname(k)."] ".(g:leaderGuide_display_plus_menus ? (type(s:lmap[k]) == type({}) ? "+" : "") : "").desc
         let crow = get(rows, row, [])
         if empty(crow)
             call add(rows, crow)

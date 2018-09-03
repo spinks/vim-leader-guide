@@ -10,6 +10,8 @@ vim-leader-guide is a vim keymap-display loosely inspired by emacs's [guide-key]
 - The leader menu now sets the statusline title to the name of the submenu, if in a submenu, otherwise maintaining original behaviour.
 	- i.e. if in a 'buffer' submenu the statusline will display 'buffer' instead of 'Leader Guide'
 - Fix bug where: on calling LeaderGuideD before calling LeaderGuide an error would throw due to undefined s:reg variable
+- Add option to display menu keys with a "+" in-front of the description if they expand into a submenu (à la emacs-which-key)
+	- option is `g:leaderGuide_display_plus_menus = 0`, off by default
 
 This Plugin is not stable yet. The configuration and commands might change in the future.
 
