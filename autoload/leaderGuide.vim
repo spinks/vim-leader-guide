@@ -352,7 +352,7 @@ function! s:wait_for_input() " {{{
     elseif match(inp, "^<LGCMD>submode") == 0
         call s:submode_mappings()
     else
-        let fsel = get(s:lmap, inp)
+        let fsel = get(s:lmap, inp[-1:])
         call s:handle_input(fsel)
     endif
 endfunction " }}}
