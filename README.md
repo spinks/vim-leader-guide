@@ -4,8 +4,8 @@ vim-leader-guide is a vim keymap-display loosely inspired by emacs's [guide-key]
 
 ### Fork Changes
 - Added ability to hide shortcuts from leader menu, while still being executable from within the leader menu,
-	- Done by setting shortcut description to "leader_ignore"
-	- i.e. let g:lmap.w = ['w', 'leader_ignore']
+	- Done by setting shortcut description to `"leader_ignore"`
+	- i.e. `let g:lmap.w = ['w', 'leader_ignore']`
 - Fix bug where: on entering incorrect keybindings the cursor would jump to the top of the file you were editing
 - The leader menu now sets the statusline title to the name of the submenu, if in a submenu, otherwise maintaining original behaviour.
 	- i.e. if in a 'buffer' submenu the statusline will display 'buffer' instead of 'Leader Guide'
@@ -13,6 +13,9 @@ vim-leader-guide is a vim keymap-display loosely inspired by emacs's [guide-key]
 - Add option to display menu keys with a "+" in-front of the description if they expand into a submenu (à la emacs-which-key)
 	- option is `g:leaderGuide_display_plus_menus = 0`, off by default
 - The leader menu will now wait for a either a correct input to perform the action, or escape/enter to exit the menu 
+#### Fork Todos
+- Update docs
+- Add syntax highlighting for menu names when `g:leaderGuide_display_plus_menus` is enabled
 
 This Plugin is not stable yet. The configuration and commands might change in the future.
 
