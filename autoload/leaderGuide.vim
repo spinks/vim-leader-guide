@@ -207,7 +207,8 @@ function! s:show_displayname(inp) " {{{
 endfunction " }}}
 " displaynames {{{1 "
 let s:displaynames = {'<C-I>': '<Tab>',
-                    \ '<C-H>': '<BS>'}
+                    \ '<C-H>': '<BS>',
+                    \ ' ': 'SPC'}
 " 1}}} "
 
 
@@ -334,7 +335,7 @@ function! s:handle_input(input) " {{{
     else
         call feedkeys(s:vis.s:reg.s:count, 'ti')
         redraw
-        if (type(a:input) == type(0)) && a:input == 0
+        if (type(a:input) == type(0)) " key not in dict
           return
         endif 
         try
@@ -349,6 +350,7 @@ function! s:wait_for_input() " {{{
     let inp = input("")
     if inp ==? ''
         call s:winclose()
+        call feedkeys(s:vis.s:reg.s:count, 'ti')
     elseif match(inp, "^<LGCMD>submode") == 0
         call s:submode_mappings()
     else
