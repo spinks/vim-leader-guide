@@ -214,12 +214,7 @@ let s:displaynames = {'<C-I>': '<Tab>',
 
 function! s:calc_layout() " {{{
     let ret = {}
-    let smap = filter(copy(s:lmap), 'v:key !=# "name"')
-    for key in keys(smap)
-        if type(smap[key]) == type([]) && smap[key][1] == "leader_ignore"
-            unlet smap[key]
-        endif
-    endfor
+    let smap = filter(copy(s:lmap), '(v:key !=# "name") && !(type(v:val) == type([]) && v:val[1] == "leader_ignore")')
     let ret.n_items = len(smap)
     let length = values(map(smap, 
                 \ 'strdisplaywidth("[".v:key."]".'.
