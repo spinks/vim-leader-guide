@@ -12,10 +12,15 @@ vim-leader-guide is a vim keymap-display loosely inspired by emacs's [guide-key]
 - Fix bug where: on calling LeaderGuideD before calling LeaderGuide an error would throw due to undefined s:reg variable
 - Add option to display menu keys with a "+" in-front of the description if they expand into a submenu (à la emacs-which-key)
 	- option is `g:leaderGuide_display_plus_menus = 0`, off by default
+	- also added syntax highlighting such that submenus are highlighted differently to functions in the guide
 - The leader menu will now wait for a either a correct input to perform the action, or escape/enter to exit the menu 
+- Add variable `g:leaderGuide_key_name_map` which is a dict which can be defined by the user to add alternate display names for the keys they map, by default this is not initialized
+	- i.e. if one wanted to change the display name for the key `'b'` for whatever reason you would set `g:leaderGuide_key_name_map = {'b': 'custom'}`
+	- `<space>` mappings which would previously display `[ ]` now display `[SPC]`
+	- with this the layout calculation now takes these mappings into consideration 
 #### Fork Todos
 - Update docs
-- Add syntax highlighting for menu names when `g:leaderGuide_display_plus_menus` is enabled
+- ~~Add syntax highlighting for menu names when `g:leaderGuide_display_plus_menus` is enabled~~
 
 This Plugin is not stable yet. The configuration and commands might change in the future.
 

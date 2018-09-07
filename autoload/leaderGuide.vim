@@ -198,28 +198,40 @@ function! s:escape_keys(inp) " {{{
     let ret = substitute(a:inp, "<", "<lt>", "")
     return substitute(ret, "|", "<Bar>", "")
 endfunction " }}}
-function! s:show_displayname(inp) " {{{
-    if has_key(s:displaynames, toupper(a:inp))
-        return s:displaynames[toupper(a:inp)]
-    else
-        return a:inp
-    end
-endfunction " }}}
 " displaynames {{{1 "
+let s:custom_key_name_map_check = 0
 let s:displaynames = {'<C-I>': '<Tab>',
                     \ '<C-H>': '<BS>',
                     \ ' ': 'SPC'}
 " 1}}} "
+function! s:show_displayname(inp) " {{{
+    if !s:custom_key_name_map_check " only call on first run
+      if exists('g:leaderGuide_key_name_map')
+        for key in keys(g:leaderGuide_key_name_map)
+          let s:displaynames[key] = g:leaderGuide_key_name_map[key]
+        endfor
+      endif
+      let s:custom_key_name_map_check = 1
+    endif
 
+    if (a:inp ==? '<c-i>' || a:inp ==? '<c-h>')
+      call toupper(a:inp)
+    endif
+    if has_key(s:displaynames, a:inp)
+        return s:displaynames[a:inp]
+    else
+        return a:inp
+    endif
+endfunction " }}}
 
 function! s:calc_layout() " {{{
     let ret = {}
     let smap = filter(copy(s:lmap), '(v:key !=# "name") && !(type(v:val) == type([]) && v:val[1] == "leader_ignore")')
     let ret.n_items = len(smap)
     let length = values(map(smap, 
-                \ 'strdisplaywidth("[".v:key."]".'.
+                \ 'strdisplaywidth("[".s:show_displayname(v:key)."]".'.
                 \ '(type(v:val) == type({}) ?'.
-                \ '(g:leaderGuide_display_plus_menus ? v:val["name"]."s" : v:val["name"])'.
+                \ '(g:leaderGuide_display_plus_menus ? "+".v:val["name"] : v:val["name"])'.
                 \ ': v:val[1]))'))
     let maxlength = max(length) + g:leaderGuide_hspace
     if g:leaderGuide_vertical
