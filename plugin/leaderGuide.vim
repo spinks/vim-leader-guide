@@ -42,6 +42,10 @@ if !exists("g:leaderGuide_max_size")
     let g:leaderGuide_max_size = 0
 endif
 
+if !exists("g:leaderGuide_match_whole")
+    let g:leaderGuide_match_whole = 0
+endif
+
 if !exists("g:leaderGuide_submode_mappings")
     let g:leaderGuide_submode_mappings = {'<C-C>': "win_close"}
 endif
