@@ -361,7 +361,9 @@ function! s:wait_for_input() " {{{
     elseif match(inp, "^<LGCMD>submode") == 0
         call s:submode_mappings()
     else
-        if g:leaderGuide_match_whole == 1
+        if inp ==? '<C-I>'
+          let fsel = get(s:lmap, inp)
+        elseif g:leaderGuide_match_whole == 1
           let fsel = get(s:lmap, inp)
         else
           let fsel = get(s:lmap, inp[-1:])
