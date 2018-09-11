@@ -40,6 +40,11 @@ function! s:merge(dict_t, dict_o) " {{{
     let target = a:dict_t
     let other = a:dict_o
     for k in keys(target)
+        if (k ==? '<TAB>' || k ==? '<C-I>') && !(k ==# '<C-I>') 
+            let target['<C-I>'] = target[k]
+            unlet target[k]
+            let k = '<C-I>'
+        endif
         if type(target[k]) == type({}) && has_key(other, k)
             if type(other[k]) == type({})
                 if has_key(target[k], 'name')
@@ -55,6 +60,8 @@ function! s:merge(dict_t, dict_o) " {{{
                     call s:merge(target[k."m"], other[k."m"])
                 endif
             endif
+        elseif type(target[k]) == type("") && has_key(other, k) && k != 'name'
+            let target[k] = [other[k][0], target[k]]
         endif
     endfor
     call extend(target, other, "keep")
@@ -361,9 +368,7 @@ function! s:wait_for_input() " {{{
     elseif match(inp, "^<LGCMD>submode") == 0
         call s:submode_mappings()
     else
-        if inp ==? '<C-I>'
-          let fsel = get(s:lmap, inp)
-        elseif g:leaderGuide_match_whole == 1
+        if inp ==? '<C-I>' || inp ==? '<TAB>' || g:leaderGuide_match_whole == 1
           let fsel = get(s:lmap, inp)
         else
           let fsel = get(s:lmap, inp[-1:])

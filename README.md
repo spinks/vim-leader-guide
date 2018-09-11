@@ -3,9 +3,11 @@
 vim-leader-guide is a vim keymap-display loosely inspired by emacs's [guide-key](https://github.com/kai2nenobu/guide-key).
 
 ### Fork Changes
+- Can now set map descriptions without having to manually make a list and rewrite the keys
+  - i.e. if you previously had a mapping `nnoremap <leader>m :call func()<CR>` you would have had to make the description using the method `let g:lmap.m = ['call func()', 'description']`. Now it can be done as simply as this, `let g:lmap.m = 'description'`
 - Added ability to hide shortcuts from leader menu, while still being executable from within the leader menu,
 	- Done by setting shortcut description to `"leader_ignore"`
-	- i.e. `let g:lmap.w = ['w', 'leader_ignore']`
+	- i.e. `let g:lmap.w = ['call func()', 'leader_ignore']`
 - Fix bug where: on entering incorrect keybindings the cursor would jump to the top of the file you were editing
 - The leader menu now sets the statusline title to the name of the submenu, if in a submenu, otherwise maintaining original behaviour.
 	- i.e. if in a 'buffer' submenu the statusline will display 'buffer' instead of 'Leader Guide'
@@ -20,6 +22,7 @@ vim-leader-guide is a vim keymap-display loosely inspired by emacs's [guide-key]
 	- with this the layout calculation now takes these mappings into consideration 
 - Add variable `g:leaderGuide_match_whole`, setting this to `1` allows for multi-key mappings where the root (all but last characters) of the multi-key mapping is a second function, however it also means that incorrect keys entered before the mapping will be read, meaning that there will be no function called. Alternatively leaving it as `0` (the default) will mean that it will only try and match the last key, allowing for incorrect key presses leading up to the correct key.
   - You should set this depending on your use. For instance if you need a function for one key, say `m` and then a second function for `mr` you should set this variable to `1`, if not leave it as `0`
+- Fix issues with mappings to Tab key when these are defined in your mapping dict.
 #### Fork Todos
 - Update docs
 - ~~Add syntax highlighting for menu names when `g:leaderGuide_display_plus_menus` is enabled~~
