@@ -214,9 +214,7 @@ let s:displaynames = {'<C-I>': '<Tab>',
 function! s:show_displayname(inp) " {{{
     if !s:custom_key_name_map_check " only call on first run
       if exists('g:leaderGuide_key_name_map')
-        for key in keys(g:leaderGuide_key_name_map)
-          let s:displaynames[key] = g:leaderGuide_key_name_map[key]
-        endfor
+        call extend(s:displaynames, g:leaderGuide_key_name_map, 'force')
       endif
       let s:custom_key_name_map_check = 1
     endif
