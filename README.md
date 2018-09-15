@@ -23,6 +23,9 @@ vim-leader-guide is a vim keymap-display loosely inspired by emacs's [guide-key]
 - Add variable `g:leaderGuide_match_whole`, setting this to `1` allows for multi-key mappings where the root (all but last characters) of the multi-key mapping is a second function, however it also means that incorrect keys entered before the mapping will be read, meaning that there will be no function called. Alternatively leaving it as `0` (the default) will mean that it will only try and match the last key, allowing for incorrect key presses leading up to the correct key.
   - You should set this depending on your use. For instance if you need a function for one key, say `m` and then a second function for `mr` you should set this variable to `1`, if not leave it as `0`
 - Fix issues with mappings to Tab key when these are defined in your mapping dict.
+- Add variable `g:leaderGuide_mode_local_only`, set to `1` (enabled) by default, this option will filter the guide to only show keys that are mapped in native vim, this allows for custom descriptions for buffer local (filetype dependent) mappings to only show when in that filetype.
+  - Also fixes issue where if a mapping is described by only a string description instead of traditional list entry and that mapping is not natively mapped in the current mode (visual/normal) or buffer (filetype) it would take the second character of the string, as these are now filtered this is not an issue
+  - If you want mappings to appear in both normal and visual modes make sure to just map not nmap or vmap
 #### Fork Todos
 - Update docs
 - ~~Add syntax highlighting for menu names when `g:leaderGuide_display_plus_menus` is enabled~~

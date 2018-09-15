@@ -22,6 +22,10 @@ if !exists('g:leaderGuide_run_map_on_popup')
     let g:leaderGuide_run_map_on_popup = 1
 endif
 
+if !exists('g:leaderGuide_mode_local_only')
+    let g:leaderGuide_mode_local_only = 1
+endif
+
 if !exists("g:leaderGuide_display_plus_menus")
     let g:leaderGuide_display_plus_menus = 0
 endif

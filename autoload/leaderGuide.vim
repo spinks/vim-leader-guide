@@ -62,6 +62,8 @@ function! s:merge(dict_t, dict_o) " {{{
             endif
         elseif type(target[k]) == type("") && has_key(other, k) && k != 'name'
             let target[k] = [other[k][0], target[k]]
+        elseif g:leaderGuide_mode_local_only
+            unlet target[k]
         endif
     endfor
     call extend(target, other, "keep")
