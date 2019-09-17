@@ -209,9 +209,7 @@ function! s:escape_keys(inp) " {{{
 endfunction " }}}
 " displaynames {{{1 "
 let s:custom_key_name_map_check = 0
-let s:displaynames = {'<C-I>': '<Tab>',
-                    \ '<C-H>': '<BS>',
-                    \ ' ': 'SPC'}
+let s:displaynames = {'<C-I>': '<Tab>', '<C-H>': '<BS>', ' ': 'SPC'}
 " 1}}} "
 function! s:show_displayname(inp) " {{{
     if !s:custom_key_name_map_check " only call on first run
