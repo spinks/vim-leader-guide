@@ -3,6 +3,8 @@
 vim-leader-guide is a vim keymap-display loosely inspired by emacs's [guide-key](https://github.com/kai2nenobu/guide-key).
 
 ### Fork Changes
+This fork of `hecal3/vim-leader-guide` fixes many issues and introduces many new features detailed below.
+
 - Can now set map descriptions without having to manually make a list and rewrite the keys
   - i.e. if you previously had a mapping `nnoremap <leader>m :call func()<CR>` you would have had to make the description using the method `let g:lmap.m = ['call func()', 'description']`. Now it can be done as simply as this, `let g:lmap.m = 'description'`
 - Added ability to hide shortcuts from leader menu, while still being executable from within the leader menu,
@@ -48,7 +50,7 @@ This Plugin is not stable yet. The configuration and commands might change in th
 ## Installation
 
 - [Plug](https://github.com/junegunn/vim-plug)
-  - `Plug 'hecal3/vim-leader-guide'`
+  - `Plug 'spinks/vim-leader-guide'`
 
 For manual installation copy this repository somewhere and add its path to the vim runtimepath.
 
