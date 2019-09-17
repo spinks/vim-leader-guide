@@ -48,7 +48,8 @@ let g:lmap.b.l = 'list'
 
 ---
 
-##Mappings 
+## Mappings
+
 Mappings can be defined in three ways.
 
 #### Recommended 
