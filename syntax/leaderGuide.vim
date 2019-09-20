@@ -25,3 +25,4 @@ endif
 hi def link LeaderGuideDesc Identifier
 hi def link LeaderGuideKeys Type
 hi def link LeaderGuideBrackets Delimiter
+hi def link LeaderGuideFloating NormalFloat

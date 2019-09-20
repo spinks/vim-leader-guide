@@ -78,7 +78,6 @@ function! leaderGuide#parse_mappings() " {{{
     endfor
 endfunction " }}}
 
-
 function! s:start_parser(key, dict) " {{{
     let key = a:key ==? ' ' ? "<Space>" : a:key
     let readmap = ""
@@ -218,7 +217,6 @@ function! s:show_displayname(inp) " {{{
       endif
       let s:custom_key_name_map_check = 1
     endif
-
     if (a:inp ==? '<c-i>' || a:inp ==? '<c-h>')
       call toupper(a:inp)
     endif
@@ -249,17 +247,17 @@ function! s:calc_layout() " {{{
         let ret.col_width = winwidth(0) / ret.n_cols
         let ret.n_rows = ret.n_items / ret.n_cols + (fmod(ret.n_items,ret.n_cols) > 0 ? 1 : 0)
         let ret.win_dim = ret.n_rows
-        "echom string(ret)
     endif
+    let ret.win_dim = g:leaderGuide_max_size ? min([g:leaderGuide_max_size, ret.win_dim]) : ret.win_dim
     return ret
 endfunction " }}}
+
 function! s:create_string(layout) " {{{
     let l = a:layout
     let l.capacity = l.n_rows * l.n_cols
     let overcap = l.capacity - l.n_items
     let overh = l.n_cols - overcap
     let n_rows =  l.n_rows - 1
-
     let rows = []
     let row = 0
     let col = 0
@@ -277,7 +275,6 @@ function! s:create_string(layout) " {{{
         endif
         call add(crow, displaystring)
         call add(crow, repeat(' ', l.col_width - strdisplaywidth(displaystring)))
-
         if !g:leaderGuide_sort_horizontal
             if row >= n_rows - 1
                 if overh > 0 && row < n_rows
@@ -308,48 +305,28 @@ function! s:create_string(layout) " {{{
             let mlen = strdisplaywidth(line)
         endif
     endfor
-    call insert(r, '')
-    let output = join(r, "\n ")
     cnoremap <nowait> <buffer> <Space> <Space><CR>
     cnoremap <nowait> <buffer> <silent> <c-c> <LGCMD>submode<CR>
-    return output
+    return r
 endfunction " }}}
 
-
-function! s:start_buffer(StatusString) " {{{
-    let s:winv = winsaveview()
-    let s:winnr = winnr()
-    let s:winres = winrestcmd()
-    call s:winopen(a:StatusString)
-    let layout = s:calc_layout()
-    let string = s:create_string(layout)
-
-    if g:leaderGuide_max_size
-        let layout.win_dim = min([g:leaderGuide_max_size, layout.win_dim])
-    endif
-
-    setlocal modifiable
-    if g:leaderGuide_vertical
-        noautocmd execute 'vert res '.layout.win_dim
-    else
-        noautocmd execute 'res '.layout.win_dim
-    endif
-    silent 1put!=string
-    normal! gg"_dd
-    setlocal nomodifiable
-    call s:wait_for_input()
+function! s:start_buffer() " {{{
+  call s:winopen()
+  call nvim_buf_set_lines(s:bufnr, 0, -1, 0, s:create_string(s:layout))
+  redraw
+  call s:wait_for_input()
 endfunction " }}}
+
 function! s:handle_input(input) " {{{
-    call s:winclose()
     if type(a:input) ==? type({})
         let s:lmap = a:input
-        call s:start_buffer(a:input['name'])
+        call s:winclose()
+        call s:start_buffer()
     else
-        call feedkeys(s:vis.s:reg.s:count, 'ti')
-        redraw
         if (type(a:input) == type(0)) " key not in dict
           return
-        endif 
+        endif
+        call s:winclose()
         try
             unsilent execute a:input[0]
         catch
@@ -357,12 +334,11 @@ function! s:handle_input(input) " {{{
         endtry
     endif
 endfunction " }}}
+
 function! s:wait_for_input() " {{{
-    redraw
-    let inp = input("")
+    let inp = input('')
     if inp ==? ''
         call s:winclose()
-        call feedkeys(s:vis.s:reg.s:count, 'ti')
     elseif match(inp, "^<LGCMD>submode") == 0
         call s:submode_mappings()
     else
@@ -376,46 +352,34 @@ function! s:wait_for_input() " {{{
         call s:handle_input(fsel)
     endif
 endfunction " }}}
-function! s:winopen(StatusString) " {{{
-    if !exists('s:bufnr')
-        let s:bufnr = -1
-    endif
-    let pos = g:leaderGuide_position ==? 'topleft' ? 'topleft' : 'botright'
-    if bufexists(s:bufnr)
-        let qfbuf = &buftype ==# 'quickfix'
-        let splitcmd = g:leaderGuide_vertical ? ' 1vs' : ' 1sp'
-        noautocmd execute pos.splitcmd
-        let bnum = bufnr('%')
-        noautocmd execute 'buffer '.s:bufnr
-        cmapclear <buffer>
-        if qfbuf
-            noautocmd execute bnum.'bwipeout!'
-        endif
-    else
-        let splitcmd = g:leaderGuide_vertical ? ' 1vnew' : ' 1new'
-        noautocmd execute pos.splitcmd
-        let s:bufnr = bufnr('%')
-        autocmd WinLeave <buffer> call s:winclose()
-    endif
-    let s:gwin = winnr()
-    setlocal filetype=leaderGuide
-    setlocal nonumber norelativenumber nolist nomodeline nowrap nopaste
-    setlocal nobuflisted buftype=nofile bufhidden=unload noswapfile
-    setlocal nocursorline nocursorcolumn colorcolumn=
-    setlocal winfixwidth winfixheight
-    let g:leaderGuide_status_string = "\  ".a:StatusString
-    setlocal statusline=%{g:leaderGuide_status_string}
+
+function! s:winopen() " {{{
+  let s:bufnr = nvim_create_buf(v:false, v:false)
+  let vert = g:leaderGuide_vertical
+  let left = (g:leaderGuide_position ==? 'topleft')
+  call nvim_open_win(s:bufnr, v:true, {'relative' : 'editor', 'style' : 'minimal',
+        \'anchor' : (vert ? (left ? 'NW' : 'NE') : (left ? 'NW' : 'SW')), 
+        \'row' : ((!vert && !left) ? &lines : 0), 'col' : ((vert && !left) ? &columns : 0), 
+        \'width': &columns, 'height' : &lines})
+  let s:gwin = winnr()
+  let s:layout = s:calc_layout()
+  if g:leaderGuide_vertical
+      noautocmd execute 'vert res '.s:layout.win_dim
+  else
+      noautocmd execute 'res '.s:layout.win_dim
+  endif
+  setlocal filetype=leaderGuide
+  setlocal nobuflisted buftype=nofile bufhidden=unload noswapfile
+  setlocal winfixwidth winfixheight
+  setlocal winhighlight=Normal:LeaderGuideFloating
 endfunction " }}}
+
 function! s:winclose() " {{{
-    noautocmd execute s:gwin.'wincmd w'
-    if s:gwin == winnr()
-        close
-        exe s:winres
-        let s:gwin = -1
-        noautocmd execute s:winnr.'wincmd w'
-        call winrestview(s:winv)
-    endif
+  if s:gwin == winnr()
+    close!
+  endif
 endfunction " }}}
+
 function! s:page_down() " {{{
     call feedkeys("\<c-c>", "n")
     call feedkeys("\<c-f>", "x")
@@ -462,7 +426,41 @@ function! s:mapmaparg(maparg) " {{{
     execute st
 endfunction " }}}
 
-function! s:get_register() "{{{
+function! leaderGuide#start_by_prefix(vis, key) " {{{
+    let s:vis = a:vis ? 'gv' : ''
+    let s:count = v:count != 0 ? v:count : ''
+    let s:toplevel = a:key ==? '  '
+    if has('nvim') && !exists('s:reg')
+        let s:reg = ''
+    else
+        let s:reg = v:register != s:get_register() ? '"'.v:register : ''
+    endif
+    if !has_key(s:cached_dicts, a:key) || g:leaderGuide_run_map_on_popup
+        "first run
+        let s:cached_dicts[a:key] = {}
+        call s:start_parser(a:key, s:cached_dicts[a:key])
+    endif    
+    if has_key(s:desc_lookup, a:key) || has_key(s:desc_lookup , 'top')
+        let rundict = s:create_target_dict(a:key)
+    else
+        let rundict = s:cached_dicts[a:key]
+    endif
+    let s:lmap = rundict
+    call s:start_buffer()
+endfunction " }}}
+function! leaderGuide#start(vis, dict) " {{{
+    let s:vis = a:vis ? 'gv' : 0
+    let s:count = v:count != 0 ? v:count : ''
+    if has('nvim') && !exists('s:reg')
+        let s:reg = ''
+    else
+        let s:reg = v:register != s:get_register() ? '"'.v:register : ''
+    endif
+    let s:lmap = a:dict
+    call s:start_buffer()
+endfunction " }}}
+
+function! s:get_register() " {{{
     if match(&clipboard, 'unnamedplus') >= 0
         let clip = '+'
     elseif match(&clipboard, 'unnamed') >= 0
@@ -471,45 +469,6 @@ function! s:get_register() "{{{
         let clip = '"'
     endif
     return clip
-endfunction "}}}
-function! leaderGuide#start_by_prefix(vis, key) " {{{
-    let s:vis = a:vis ? 'gv' : ''
-    let s:count = v:count != 0 ? v:count : ''
-    let s:toplevel = a:key ==? '  '
-
-    if has('nvim') && !exists('s:reg')
-        let s:reg = ''
-    else
-        let s:reg = v:register != s:get_register() ? '"'.v:register : ''
-    endif
-
-    if !has_key(s:cached_dicts, a:key) || g:leaderGuide_run_map_on_popup
-        "first run
-        let s:cached_dicts[a:key] = {}
-        call s:start_parser(a:key, s:cached_dicts[a:key])
-    endif
-    
-    if has_key(s:desc_lookup, a:key) || has_key(s:desc_lookup , 'top')
-        let rundict = s:create_target_dict(a:key)
-    else
-        let rundict = s:cached_dicts[a:key]
-    endif
-    let s:lmap = rundict
-
-    call s:start_buffer('Leader Guide')
-endfunction " }}}
-function! leaderGuide#start(vis, dict) " {{{
-    let s:vis = a:vis ? 'gv' : 0
-    let s:count = v:count != 0 ? v:count : ''
-
-    if has('nvim') && !exists('s:reg')
-        let s:reg = ''
-    else
-        let s:reg = v:register != s:get_register() ? '"'.v:register : ''
-    endif
-
-    let s:lmap = a:dict
-    call s:start_buffer("Leader Guide")
 endfunction " }}}
 
 let &cpo = s:save_cpo
