@@ -318,20 +318,18 @@ function! s:start_buffer() " {{{
 endfunction " }}}
 
 function! s:handle_input(input) " {{{
+  call s:winclose()
   if type(a:input) ==? type({})
     let s:lmap = a:input
-    call s:winclose()
     call s:start_buffer()
   else
-    if (type(a:input) == type(0)) " key not in dict
-      return
+    if (type(a:input) != type(0)) " key not in dict
+      try
+        unsilent execute a:input[0]
+      catch
+        unsilent echom v:exception
+      endtry
     endif
-    call s:winclose()
-    try
-      unsilent execute a:input[0]
-    catch
-      unsilent echom v:exception
-    endtry
   endif
 endfunction " }}}
 
