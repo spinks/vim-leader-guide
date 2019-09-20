@@ -1,5 +1,5 @@
 if exists("b:current_syntax")
-    finish
+  finish
 endif
 let b:current_syntax = "leaderguide"
 
@@ -12,10 +12,10 @@ syn region LeaderGuideBrackets start="\(^\|\s\+\)\[" end="\]\s\+"
 if g:leaderGuide_display_plus_menus == 1
   syn region LeaderGuideMenu start="+" end="\s"
         \ contained 
-  
+
   syn region LeaderGuideDesc start="^" end="$"
         \ contains=LeaderGuideBrackets, LeaderGuideMenu keepend
-  
+
   hi def link LeaderGuideMenu Title
 else
   syn region LeaderGuideDesc start="^" end="$"
