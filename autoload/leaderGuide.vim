@@ -313,7 +313,6 @@ endfunction " }}}
 function! s:start_buffer() " {{{
   call s:winopen()
   call nvim_buf_set_lines(s:bufnr, 0, -1, 0, s:create_string(s:layout))
-  redraw
   call s:wait_for_input()
 endfunction " }}}
 
@@ -336,6 +335,7 @@ function! s:handle_input(input) " {{{
 endfunction " }}}
 
 function! s:wait_for_input() " {{{
+    redraw
     let inp = input('')
     if inp ==? ''
         call s:winclose()
