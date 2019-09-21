@@ -231,20 +231,29 @@ hi def link LeaderGuideFloating Normal
 Popup position and orientation:
 
 ```vim
-" Bottom (default)
-" let g:leaderGuide_vertical = 0
-" let g:leaderGuide_position = 'botright'
+" Horizontal modes (default)
+let g:leaderGuide_vertical = 0
+  " Bottom (default)
+  let g:leaderGuide_position = 'botleft'
+  
+  " Top
+  let g:leaderGuide_position = 'topleft'
 
-" Top
-let g:leaderGuide_position = 'topleft'
-
-" Left
+" Vertical modes
 let g:leaderGuide_vertical = 1
-let g:leaderGuide_position = 'topleft'
+  " Left
+    " With mappings at the bottom of the screen
+    let g:leaderGuide_position = 'botleft'
+    
+    " With mappings at the top of the screen
+    let g:leaderGuide_position = 'topleft'
 
-" Right
-let g:leaderGuide_vertical = 1
-let g:leaderGuide_position = 'botright'
+  " Right
+    " With mappings at the bottom of the screen
+    let g:leaderGuide_position = 'botright'
+
+    " With mappings at the top of the screen
+    let g:leaderGuide_position = 'topright'
 ```
 
 Minimum horizontal space between columns:
@@ -297,6 +306,7 @@ A list of all changes in this fork is below, with todos:
   - Also fixes issue where if a mapping is described by only a string description instead of traditional list entry and that mapping is not natively mapped in the current mode (visual/normal) or buffer (filetype) it would take the second character of the string, as these are now filtered this is not an issue
   - If you want mappings to appear in both normal and visual modes make sure to just map not nmap or vmap
 - Make use of neovim's floating windows
+  - Allow aligning mappings to top or bottom in vertical window modes
 #### Fork Todos
 - Update docs
 - ~~Add syntax highlighting for menu names when `g:leaderGuide_display_plus_menus` is enabled~~

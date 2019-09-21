@@ -15,7 +15,7 @@ if !exists('g:leaderGuide_sort_horizontal')
 endif
 
 if !exists('g:leaderGuide_position')
-  let g:leaderGuide_position = 'botright'
+  let g:leaderGuide_position = 'botleft'
 endif
 
 if !exists('g:leaderGuide_run_map_on_popup')

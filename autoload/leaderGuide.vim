@@ -313,7 +313,13 @@ endfunction " }}}
 
 function! s:start_buffer() " {{{
   call s:winopen()
-  call nvim_buf_set_lines(s:bufnr, 0, -1, 0, s:create_string(s:layout))
+  let l:string_arr = s:create_string(s:layout)
+  let l:start = 0
+  if g:leaderGuide_vertical && (g:leaderGuide_position[:2] ==? 'bot')
+    call nvim_buf_set_lines(s:bufnr, 0, -1, 0, repeat([''], winheight(0)))
+    let l:start = -len(l:string_arr)-1
+  endif
+  call nvim_buf_set_lines(s:bufnr, l:start, -1, 0, l:string_arr)
   call s:wait_for_input()
 endfunction " }}}
 
@@ -355,10 +361,11 @@ endfunction " }}}
 function! s:winopen() " {{{
   let s:bufnr = nvim_create_buf(v:false, v:false)
   let vert = g:leaderGuide_vertical
-  let left = (g:leaderGuide_position ==? 'topleft')
+  let left = (g:leaderGuide_position[3:] ==? 'left')
+  let top = (g:leaderGuide_position[:2] ==? 'top')
   call nvim_open_win(s:bufnr, v:true, {'relative' : 'editor', 'style' : 'minimal',
-        \'anchor' : (vert ? (left ? 'NW' : 'NE') : (left ? 'NW' : 'SW')), 
-        \'row' : ((!vert && !left) ? &lines : 0), 'col' : ((vert && !left) ? &columns : 0), 
+        \'anchor' : (vert ? (left ? 'NW' : 'NE') : (top ? 'NW' : 'SW')), 
+        \'row' : ((!vert && !top) ? &lines : 0), 'col' : ((vert && !left) ? &columns : 0), 
         \'width': &columns, 'height' : &lines})
   let s:gwin = winnr()
   let s:layout = s:calc_layout()
