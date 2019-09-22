@@ -159,9 +159,7 @@ function! s:flattenmap(dict, str) " {{{
   let ret = {}
   for kv in keys(a:dict)
     if type(a:dict[kv]) == type([])
-      let toret = {}
-      let toret[a:str.kv] = a:dict[kv]
-      return toret
+      return {a:str.kv : a:dict[kv]}
     elseif type(a:dict[kv]) == type({})
       let strcall = a:str.kv
       call extend(ret, s:flattenmap(a:dict[kv], a:str.kv))
@@ -207,10 +205,10 @@ function! s:escape_keys(inp) " {{{
   let ret = substitute(a:inp, "<", "<lt>", "")
   return substitute(ret, "|", "<Bar>", "")
 endfunction " }}}
-" displaynames {{{1 "
+" displaynames {{{
 let s:custom_key_name_map_check = 0
 let s:displaynames = {'<C-I>': '<Tab>', '<C-H>': '<BS>', ' ': 'SPC'}
-" 1}}} "
+" }}}
 function! s:show_displayname(inp) " {{{
   if !s:custom_key_name_map_check " only call on first run
     if exists('g:leaderGuide_key_name_map')
@@ -221,11 +219,7 @@ function! s:show_displayname(inp) " {{{
   if (a:inp ==? '<c-i>' || a:inp ==? '<c-h>')
     call toupper(a:inp)
   endif
-  if has_key(s:displaynames, a:inp)
-    return s:displaynames[a:inp]
-  else
-    return a:inp
-  endif
+  return get(s:displaynames, a:inp, a:inp)
 endfunction " }}}
 
 function! s:calc_layout() " {{{
@@ -266,49 +260,39 @@ function! s:create_string(layout) " {{{
   for k in smap
     silent execute "cnoremap <nowait> <buffer> ".substitute(k, "|", "<Bar>", ""). " " . s:escape_keys(k) ."<CR>"
     let desc = type(s:lmap[k]) == type({}) ? s:lmap[k].name : s:lmap[k][1]
-    if desc == "leader_ignore"
-      continue
-    endif
-    let displaystring = "[".s:show_displayname(k)."] ".(g:leaderGuide_display_plus_menus ? (type(s:lmap[k]) == type({}) ? "+" : "") : "").desc
-    let crow = get(rows, row, [])
-    if empty(crow)
-      call add(rows, crow)
-    endif
-    call add(crow, displaystring)
-    call add(crow, repeat(' ', l.col_width - strdisplaywidth(displaystring)))
-    if !g:leaderGuide_sort_horizontal
-      if row >= n_rows - 1
-        if overh > 0 && row < n_rows
-          let overh -= 1
-          let row += 1
+    if desc !=? "leader_ignore"
+      let displaystring = "[".s:show_displayname(k)."] ".(g:leaderGuide_display_plus_menus ? (type(s:lmap[k]) == type({}) ? "+" : "") : "").desc
+      let crow = get(rows, row, [])
+      if empty(crow)
+        call add(rows, crow)
+      endif
+      call add(crow, displaystring)
+      call add(crow, repeat(' ', l.col_width - strdisplaywidth(displaystring)))
+      if !g:leaderGuide_sort_horizontal
+        if row >= n_rows - 1
+          if overh > 0 && row < n_rows
+            let overh -= 1
+            let row += 1
+          else
+            let row = 0
+            let col += 1
+          endif
         else
-          let row = 0
-          let col += 1
+          let row += 1
         endif
       else
-        let row += 1
+        if col == l.n_cols - 1
+          let row +=1
+          let col = 0
+        else
+          let col += 1
+        endif
       endif
-    else
-      if col == l.n_cols - 1
-        let row +=1
-        let col = 0
-      else
-        let col += 1
-      endif
-    endif
-  endfor
-  let r = []
-  let mlen = 0
-  for ro in rows
-    let line = join(ro, '')
-    call add(r, line)
-    if strdisplaywidth(line) > mlen
-      let mlen = strdisplaywidth(line)
     endif
   endfor
   cnoremap <nowait> <buffer> <Space> <Space><CR>
   cnoremap <nowait> <buffer> <silent> <c-c> <LGCMD>submode<CR>
-  return r
+  return map(rows, 'join(v:val, "")')
 endfunction " }}}
 
 function! s:start_buffer() " {{{
@@ -369,8 +353,7 @@ function! s:winopen() " {{{
         \'width': &columns, 'height' : &lines})
   let s:gwin = winnr()
   let s:layout = s:calc_layout()
-  let l:vert = (g:leaderGuide_vertical ? 'vert res ' : 'res ')
-  noautocmd execute l:vert s:layout.win_dim
+  noautocmd execute (g:leaderGuide_vertical ? 'vert res ' : 'res ') s:layout.win_dim
   setlocal filetype=leaderGuide nobuflisted buftype=nofile bufhidden=unload noswapfile
   setlocal winfixwidth winfixheight winhighlight=Normal:LeaderGuideFloating
 endfunction " }}}
