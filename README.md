@@ -1,6 +1,6 @@
 # vim-leader-guide
 
-vim-leader-guide is a vim keymap-display loosely inspired by emacs's [guide-key](https://github.com/kai2nenobu/guide-key).
+vim-leader-guide is a neovim keymap-display loosely inspired by emacs's [guide-key](https://github.com/kai2nenobu/guide-key).
 
 This fork of `hecal3/vim-leader-guide` fixes issues and introduces many new features.
 
@@ -21,9 +21,9 @@ This fork of `hecal3/vim-leader-guide` fixes issues and introduces many new feat
 ## Installation
 
 - [Plug](https://github.com/junegunn/vim-plug)
-  - `Plug 'spinks/vim-leader-guide', { 'branch': 'floating' }`
+  - `Plug 'spinks/vim-leader-guide'`
 
-For manual installation copy this repository somewhere and add its path to the vim runtimepath.
+For manual installation copy this repository somewhere and add its path to the neovim runtimepath.
 
 ## Example Usage
 For more detailed description of available commands and functions, and more configuration recommendations see the documentation.
