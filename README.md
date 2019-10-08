@@ -16,11 +16,12 @@ This fork of `hecal3/vim-leader-guide` fixes issues and introduces many new feat
     - Dynamic update on every call
     - Define group names and arbitrary descriptions.
     - No default mappings, no autocomands. Does nothing on it's own.
+    - Makes full use of neovims floating windows
 
 ## Installation
 
 - [Plug](https://github.com/junegunn/vim-plug)
-  - `Plug 'spinks/vim-leader-guide'`
+  - `Plug 'spinks/vim-leader-guide', { 'branch': 'floating' }`
 
 For manual installation copy this repository somewhere and add its path to the vim runtimepath.
 
@@ -170,6 +171,7 @@ call leaderGuide#register_prefix_descriptions("", "g:topd")
 " Remove the old prefixes
 "call leaderGuide#register_prefix_descriptions(",", "g:llmap")
 "call leaderGuide#register_prefix_descriptions("<Space>", "g:lmap")
+```
 
 This configuration will provide access to the `leader` and `localleader` spaces when calling with `<Plug>leaderguide-global`
 
@@ -215,23 +217,43 @@ Setting the variable `g:leaderGuide_match_whole` to `1` allows for multi-key map
   - You should set this depending on your use. For instance if you need a function for one key, say `m` and then a second function for `mr` you should set this variable to `1`, if not leave it as `0`
 
 ### Visual
+#### Floating Windows
+vim-leader-guide now makes use of neovim's floating windows API by default (vim popup window compatibility to be added).
+
+With this change the styling may be affected, this is due to the default highlight style for floating windows (`NormalFloat`) potentially being different to normal.
+vim-leader-guide uses this highlighting as default behaviour to avoid confusion.
+To change the styling simply link the `LeaderGuideFloating` highlight to any other, for example, to go back to the old style do:
+```vim
+hi def link LeaderGuideFloating Normal
+```
+
+#### Positional
 Popup position and orientation:
 
 ```vim
-" Bottom (default)
-" let g:leaderGuide_vertical = 0
-" let g:leaderGuide_position = 'botright'
+" Horizontal modes (default)
+let g:leaderGuide_vertical = 0
+  " Bottom (default)
+  let g:leaderGuide_position = 'botleft'
+  
+  " Top
+  let g:leaderGuide_position = 'topleft'
 
-" Top
-let g:leaderGuide_position = 'topleft'
-
-" Left
+" Vertical modes
 let g:leaderGuide_vertical = 1
-let g:leaderGuide_position = 'topleft'
+  " Left
+    " With mappings at the bottom of the screen
+    let g:leaderGuide_position = 'botleft'
+    
+    " With mappings at the top of the screen
+    let g:leaderGuide_position = 'topleft'
 
-" Right
-let g:leaderGuide_vertical = 1
-let g:leaderGuide_position = 'botright'
+  " Right
+    " With mappings at the bottom of the screen
+    let g:leaderGuide_position = 'botright'
+
+    " With mappings at the top of the screen
+    let g:leaderGuide_position = 'topright'
 ```
 
 Minimum horizontal space between columns:
@@ -240,6 +262,7 @@ Minimum horizontal space between columns:
 let g:leaderGuide_hspace = 5
 ```
 
+#### Menus
 Display menus with a "+" in-front of the description (à la emacs-which-key). Off by default. This also has custom syntax highlighting for menus when enabled.
 
 ```vim
@@ -282,6 +305,8 @@ A list of all changes in this fork is below, with todos:
 - Add variable `g:leaderGuide_mode_local_only`, set to `1` (enabled) by default, this option will filter the guide to only show keys that are mapped in vim (i.e. not only defined in the leader guide dict, map nmap or vmap keys), this allows for custom descriptions for buffer local (filetype dependent) mappings to only show when in that filetype as the base map would be unavailable.
   - Also fixes issue where if a mapping is described by only a string description instead of traditional list entry and that mapping is not natively mapped in the current mode (visual/normal) or buffer (filetype) it would take the second character of the string, as these are now filtered this is not an issue
   - If you want mappings to appear in both normal and visual modes make sure to just map not nmap or vmap
+- Make use of neovim's floating windows
+  - Allow aligning mappings to top or bottom in vertical window modes
 #### Fork Todos
 - Update docs
 - ~~Add syntax highlighting for menu names when `g:leaderGuide_display_plus_menus` is enabled~~
