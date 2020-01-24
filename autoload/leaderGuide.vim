@@ -241,7 +241,7 @@ function! s:calc_layout() " {{{
     let ret.n_cols = winwidth(0) / maxlength
     let ret.col_width = winwidth(0) / ret.n_cols
     let ret.n_rows = ret.n_items / ret.n_cols + (fmod(ret.n_items,ret.n_cols) > 0 ? 1 : 0)
-    let ret.win_dim = ret.n_rows
+    let ret.win_dim = ret.n_rows + ((g:leaderGuide_position[:2] ==? 'top') ? 0 : &cmdheight - 1)
   endif
   let ret.win_dim = g:leaderGuide_max_size ? min([g:leaderGuide_max_size, ret.win_dim]) : ret.win_dim
   return ret
