@@ -4,19 +4,17 @@ vim-leader-guide is a neovim keymap-display loosely inspired by emacs's [guide-k
 
 This fork of `hecal3/vim-leader-guide` fixes issues and introduces many new features.
 
-![vimleaderguide](https://i.imgur.com/WPLQZVn.png)
-
----
-![vimleaderguide2](https://i.imgur.com/BqIunY6.png)
-
+|![vimleaderguide](https://i.imgur.com/v1XWsdw.png) | The floating leader guide window, displayed in the default bottom position (left) and a vertical arrangement (below)  |
+|--|--|
+|![vimleaderguide2](https://i.imgur.com/7UPy0PK.png)| ![vimleaderguide3](https://i.imgur.com/ERF4jbu.png)|
 ## Features
-    - Show all global mappings
-    - Show all buffer-local mappings (for plugins, etc.)
-    - Show all mappings following a prefix (<leader>, <localleader>, etc.)
-    - Dynamic update on every call
-    - Define group names and arbitrary descriptions.
-    - No default mappings, no autocomands. Does nothing on it's own.
-    - Makes full use of neovims floating windows
+- Show all global mappings
+- Show all buffer-local mappings (for plugins, etc.)
+- Show all mappings following a prefix (<leader>, <localleader>, etc.)
+- Dynamic update on every call
+- Define group names and arbitrary descriptions.
+- No default mappings, no autocomands. Does nothing on it's own.
+- Makes full use of neovims floating windows
 
 ## Installation
 
@@ -53,13 +51,13 @@ let g:lmap.b.l = 'list'
 
 Mappings can be defined in three ways.
 
-#### Recommended 
+#### Recommended
 - Set the mapping in vim as you would normally
     - `nnoremap <leader>s :up<CR>`
 - Give the mapping a name in the leader guide dict (this is optional, it will otherwise display the raw command (ex. `:up`))
     - `let g:lmap.s = 'save file'`
 
-This method gives more flexibility over the mappings, means that all mappings that you make can be executed without waiting for the leader menu pop up. 
+This method gives more flexibility over the mappings, means that all mappings that you make can be executed without waiting for the leader menu pop up.
 
 This behaviour is also dictated and encouraged by the setting `g:leaderGuide_mode_local_only` which is set to `1`, enabled, by default. This means that only mappings which are available in vim (map, nmap, vmap) are displayed in the leader guide. This also helps in that mappings which are buffer local (filetype dependent) are only shown when in that filetype.
 
@@ -235,7 +233,7 @@ Popup position and orientation:
 let g:leaderGuide_vertical = 0
   " Bottom (default)
   let g:leaderGuide_position = 'botleft'
-  
+
   " Top
   let g:leaderGuide_position = 'topleft'
 
@@ -244,7 +242,7 @@ let g:leaderGuide_vertical = 1
   " Left
     " With mappings at the bottom of the screen
     let g:leaderGuide_position = 'botleft'
-    
+
     " With mappings at the top of the screen
     let g:leaderGuide_position = 'topleft'
 
@@ -279,8 +277,9 @@ let g:leaderGuide_run_map_on_popup = 0
 The update is almost instantaneous and will only run when the guide actually pops up. Apart from that the automatic update has no performance impact.
 
 
-## Fork Notes
-A list of all changes in this fork is below, with todos:
+## Development Notes
+<details>
+  <summary>Enclosed is a detailed list of all changes on this fork</summary>
 
 - Can now set map descriptions without having to manually make a list and rewrite the keys
   - i.e. if you previously had a mapping `nnoremap <leader>m :call func()<CR>` you would have had to make the description using the method `let g:lmap.m = ['call func()', 'description']`. Now it can be done as simply as this, `let g:lmap.m = 'description'`
@@ -294,11 +293,11 @@ A list of all changes in this fork is below, with todos:
 - Add option to display menu keys with a "+" in-front of the description if they expand into a submenu (à la emacs-which-key)
 	- option is `g:leaderGuide_display_plus_menus = 0`, off by default
 	- also added syntax highlighting such that submenus are highlighted differently to functions in the guide
-- The leader menu will now wait for a either a correct input to perform the action, or escape/enter to exit the menu 
+- The leader menu will now wait for a either a correct input to perform the action, or escape/enter to exit the menu
 - Add variable `g:leaderGuide_key_name_map` which is a dict which can be defined by the user to add alternate display names for the keys they map, by default this is not initialised
 	- i.e. if one wanted to change the display name for the key `'b'` for whatever reason you would set `g:leaderGuide_key_name_map = {'b': 'custom'}`
 	- `<space>` mappings which would previously display `[ ]` now display `[SPC]`
-	- with this the layout calculation now takes these mappings into consideration 
+	- with this the layout calculation now takes these mappings into consideration
 - Add variable `g:leaderGuide_match_whole`, setting this to `1` allows for multi-key mappings where the root (all but last characters) of the multi-key mapping is a second function, however it also means that incorrect keys entered before the mapping will be read, meaning that there will be no function called. Alternatively leaving it as `0` (the default) will mean that it will only try and match the last key, allowing for incorrect key presses leading up to the correct key.
   - You should set this depending on your use. For instance if you need a function for one key, say `m` and then a second function for `mr` you should set this variable to `1`, if not leave it as `0`
 - Fix issues with mappings to Tab key when these are defined in your mapping dict.
@@ -307,6 +306,8 @@ A list of all changes in this fork is below, with todos:
   - If you want mappings to appear in both normal and visual modes make sure to just map not nmap or vmap
 - Make use of neovim's floating windows
   - Allow aligning mappings to top or bottom in vertical window modes
-#### Fork Todos
+</details>
+
+#### Todos
 - Update docs
 - ~~Add syntax highlighting for menu names when `g:leaderGuide_display_plus_menus` is enabled~~
