@@ -121,7 +121,6 @@ Method 3 <Plug>-mappings~
     This way the dictionary need only contain the group names.
 
     Note: The <Plug> prefix can be hidden with: |g:leaderGuide_displayfunc|
->
 
 Final Setup~
 >
