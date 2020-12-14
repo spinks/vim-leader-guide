@@ -75,7 +75,7 @@ As mentioned this is less expressive, if you only have the mapping in the dict a
 Native vim mappings will always take precedence over dictionary-only mappings defined in this method.
 
 ##### Two
-Depending on your use case extensive dictionary configuration mightn't be necessary.
+Depending on your use case extensive dictionary configuration may not be necessary.
 
 Instead of
 ```vim
@@ -89,8 +89,8 @@ One could simply use:
     nmap <leader>fd <Plug>(open-vimrc)
 ```
 
-This variant is a lot less intrusive and just as descriptive as the dictionary variant above.
-This way it is possible use dictionaries for group names only, and let native vim-mappings handle the rest.
+This variant could be considered less intrusive.
+This way the dictionary need only contain the group names.
 
 It is also possible to hide the `<Plug>`-prefix and run other arbitrary functions like a custom search/replace or a simple value lookup on the display-name.
 
@@ -114,7 +114,7 @@ It is possible to call the guide for keys other than `leader`:
 ```vim
 nnoremap <localleader> :<c-u>LeaderGuide  ','<CR>
 vnoremap <localleader> :<c-u>LeaderGuideVisual  ','<CR>
-" This variant won't habe any group names.
+" This variant won't have any group names.
 
 " Group names can be defined by filetype. Add the following lines:
 let g:llmap = {}
@@ -189,7 +189,7 @@ It's possible to simply reuse this dictionary and enter own configuration.
 It is now possible to hide mappings from the leader guide menu, while they are still executable from within the leader menu.
 
 ```vim
-let g:lmap.w = `leader_ignore`
+let g:lmap.w = 'leader_ignore'
 ```
 
 `leader_ignore` is the reserved keyword to hide from the menu.
@@ -309,5 +309,5 @@ The update is almost instantaneous and will only run when the guide actually pop
 </details>
 
 #### Todos
-- Update docs
+- ~~Update docs~~
 - ~~Add syntax highlighting for menu names when `g:leaderGuide_display_plus_menus` is enabled~~

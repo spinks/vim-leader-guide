@@ -47,114 +47,67 @@ section.
 Descriptions~
 To replace the right-hand-side of mappings with descriptive texts use one of
 the following methods:
-    1. <Plug> or <SID> mappings (see |leader-guide-<Plug>-mappings| and
+    1. Mapped in vim and labeled in dictionary (see |leader-guide-examples| right below)
+    2. Unmapped in vim, but created in dictionary (see |g:leaderGuide_mode_local_only|)
+    3. <Plug> or <SID> mappings (see |leader-guide-<Plug>-mappings| and
         |g:leaderGuide_displayfunc|)
-    2. Lookup tables (see |g:leaderGuide_displayfunc|)
-    3. Configuration dictionaries (see |leader-guide-examples| right below)
+    4. Lookup tables (see |g:leaderGuide_displayfunc|)
 
-Configuration dictionaries are the most flexible, but also most intrusive
-variant.
-When possible I would recommend to use <Plug> or <SID> mappings.
+The first method is recommended.
+
+Hiding mappings from the leader guide~
+`leader_ignore` is the reserved keyword to hide a mapping from the guide.
+>
+    let g:lmap.w = 'leader_ignore'
+<
 
 ==============================================================================
 USAGE EXAMPLES                                           *leader-guide-examples*
 
-Basic Configuration~
+Method 1 Configuration (Mapped and Labeled)~
 >
     " Define prefix dictionary
-    let g:lmap =  {}
+    let g:lmap = {}
 
-    " Second level dictionaries:
-    let g:lmap.f = { 'name' : 'File Menu' }
-    let g:lmap.o = { 'name' : 'Open Stuff' }
-    " 'name' is a special field. It will define the name of the group.
-    " leader-f is the "File Menu" group.
-    " Unnamed groups will show an empty string
+    " Simple command
+    nnoremap <leader>s :up<CR>
+    let g:lmap.s = 'save file'
 
-    " Provide commands and descriptions for existing mappings
-    nmap <silent> <leader>fd :e $MYVIMRC<CR>
-    let g:lmap.f.d = ['e $MYVIMRC', 'Open vimrc']
+    " Define a group
+    let g:lmap.b = {'name' : 'buffers'}
+    " Create a dictionary with the special 'name' field
 
-    nmap <silent> <leader>fs :so %<CR>
-    " let g:lmap.f.s = ['so %', 'Source file']
-
-    nmap <silent> <leader>oo  :copen<CR>
-    " let g:lmap.o.o = ['copen', 'Open quickfix']
-
-    nmap <silent> <leader>ol  :lopen<CR>
-    " let g:lmap.o.l = ['lopen', 'Open locationlist']
-
-    nmap <silent> <leader>fw :w<CR>
-    " let g:lmap.f.w = ['w', 'Write file']
-<
-Menu Function~
->
-    " Create new menus not based on existing mappings:
-    let g:lmap.g = {
-                    \'name' : 'Git Menu',
-                    \'s' : ['Gstatus', 'Git Status'],
-                    \'p' : ['Gpull',   'Git Pull'],
-                    \'u' : ['Gpush',   'Git Push'],
-                    \'c' : ['Gcommit', 'Git Commit'],
-                    \'w' : ['Gwrite',  'Git Write'],
-                    \}
-
-<
-NerdCommenter~
->
-    " If you use NERDCommenter:
-    let g:lmap.c = { 'name' : 'Comments' }
-    " Define some descriptions
-    let g:lmap.c.c = ['call feedkeys("\<Plug>NERDCommenterComment")','Comment']
-    let g:lmap.c[' '] = ['call feedkeys("\<Plug>NERDCommenterToggle")','Toggle']
-    " The Descriptions for other mappings defined by NerdCommenter, will default
-    " to their respective commands.
-
-<
-Plugin Specific Menus~
->
-    " set up dictionary for <localleader>
-    let g:llmap = {}
-    autocmd FileType tex let g:llmap.l = { 'name' : 'vimtex' }
-    call leaderGuide#register_prefix_descriptions(",", "g:llmap")
-    " to name the <localleader>-n group vimtex in tex files.
+    " A mapping within a group
+    nnoremap <leader>bl :ls<CR>
+    let g:lmap.b.l = 'list'
 <
 
-Paging Function~
+Method 2 Configuration (Unmapped but Labeled)~
 >
-    let g:leaderGuide_max_size = 5
-    let g:leaderGuide_submode_mappings = { '<C-F>': 'page_down', '<C-B>': 'page_up'}
+    " Define prefix dictionary
+    let g:lmap = {}
 
+    " A group of commands that aren't mapped in vim
+    let g:lmap.w = { 'name' : '+ Windows',
+	       \ 'd' : ['close', 'Close Window'],
+	       \ 's' : ['split', 'Horizontal Split'],
+	       \ 'v' : ['vsplit', 'Vertical Split']
+           \ }
 
-Final Setup~
->
-    " combine the two dictionaries into a single top-level dictionary:
-    let g:topdict = {}
-    let g:topdict[' '] = g:lmap
-    let g:topdict[' ']['name'] = '<leader>'
-    let g:topdict[','] = g:llmap
-    let g:topdict[',']['name'] = '<localleader>'
+    " When using this method you will need to set |g:leaderGuide_mode_local_only| to 0
+    " for unmapped but labeled functions to appear in the leader guide 
+    let g:leaderGuide_mode_local_only = 0
 
-    " register it with the guide:
-    call leaderGuide#register_prefix_descriptions("", "g:topdict")
-
-    " define mappings:
-    nnoremap <silent> <leader> :<c-u>LeaderGuide '<Space>'<CR>
-    vnoremap <silent> <leader> :<c-u>LeaderGuideVisual '<Space>'<CR>
-    map <leader>. <Plug>leaderguide-global
-    nnoremap <localleader> :<c-u>LeaderGuide  ','<CR>
-    vnoremap <localleader> :<c-u>LeaderGuideVisual  ','<CR>
-    map <localleader>. <Plug>leaderguide-buffer
 <
 
                                                 *leader-guide-<Plug>-mappings*
-<Plug>-mappings~
-    Note: Depending on your use case extensive dictionary configuration might
+Method 3 <Plug>-mappings~
+    Note: Depending on your use case extensive dictionary configuration may
     not be necessary.
 
     Instead of >
     nmap <silent> <leader>fd :e $MYVIMRC<CR>
-    let g:lmap.f.d = ['e $MYVIMRC', 'Open vimrc']
+    let g:lmap.f.d = 'Open vimrc'
 <
     one could simply use: >
     nnoremap <Plug>open-vimrc :e $MYVIMRC<CR>
@@ -164,13 +117,19 @@ Final Setup~
     nnoremap <SID>open-vimrc :e $MYVIMRC<CR>
     nmap <leader>fd <SID>open-vimrc
 <
-    This variant is a lot less intrusive and just as descriptive as the
-    dictionary variant above.
-    This way it is possible to limit the dictionaries to group names.
+    This variant could be considered less intrusive.
+    This way the dictionary need only contain the group names.
 
-    Note: The <Plug> prefix can be hidden with:
-    |g:leaderGuide_displayfunc|
+    Note: The <Plug> prefix can be hidden with: |g:leaderGuide_displayfunc|
 >
+
+Final Setup~
+>
+    " register the dictionary:
+    call leaderGuide#register_prefix_descriptions("<Space>", "g:lmap")
+    nnoremap <silent> <leader> :<c-u>LeaderGuide '<Space>'<CR>
+    vnoremap <silent> <leader> :<c-u>LeaderGuideVisual '<Space>'<CR>
+<
 
 ==============================================================================
 COMMANDS                                                 *leader-guide-commands*
@@ -314,11 +273,11 @@ leaderGuide#register_prefix_descriptions("{prefix}", "{dictname}")
                                                 *leaderGuide#parse_mappings()*
 leaderGuide#parse_mappings()
     Update all cached mappings to the current ones.
-    
+
     Note: Only call this function if |g:leaderGuide_run_map_on_popup| is unset
     and the current mappings have changed (switched to a buffer with other
     mappings, new filetype, manual change, etc.)
-        
+
 
 ==============================================================================
 GLOBAL VARIABLES                                          *leader-guide-globals*
@@ -332,32 +291,32 @@ GLOBAL VARIABLES                                          *leader-guide-globals*
      |g:leaderGuide_vertical|                                0
      |g:leaderGuide_hspace|                                  5
      |g:leaderGuide_sort_horizontal|                         0
-     |g:leaderGuide_default_group_name|                       
+     |g:leaderGuide_display_plus_menus|                      0
+     |g:leaderGuide_default_group_name|
+     |g:g:leaderGuide_match_whole|                           0
      |g:leaderGuide_run_map_on_popup|                        1
      |g:leaderGuide_flatten|                                 1
      |g:leaderGuide_displayfunc|               see description
+     |g:leaderGuide_key_name_map|              see description
      |g:leaderGuide_max_size|                                0
      |g:leaderGuide_submode_mappings|          see description
 
 
                                                       *g:leaderGuide_position*
 g:leaderGuide_position~
-    Set the direction from witch the guide-buffer should pop up.
+    Position of the guide in conjunction with |g:leaderGuide_vertical|.
 
-    Note: Use in conjunction with |g:leaderGuide_vertical| to set the
-    buffer-position
+    Note: If horizontal then only use `botleft` and `topleft`.
 
-    Possible values:        `botright`, `topleft`
-    Default:                `botright`
+    Possible values:        `botleft`, `botright`, `topleft`, `topright`
+    Default:                `botleft`
 
 
                                                       *g:leaderGuide_vertical*
 g:leaderGuide_vertical~
-    If set to a value other than 0, the guide buffer will pop up in vertical
-    split window.
+    If set to a value other than 0, the guide buffer will be vertical.
 
-    Note: Use in conjunction with |g:leaderGuide_position| to set the
-    buffer-position
+    Note: Use in conjunction with |g:leaderGuide_position|
 
     Possible values:        {0,1}
     Default:                0
@@ -374,9 +333,16 @@ g:leaderGuide_hspace~
     Default:                5
 
 
-                                               *g:leaderGuide_sort_horizontal*
+                                                 *g:leaderGuide_sort_horizontal*
 g:leaderGuide_sort_horizontal~
     If set to a value other than 0, the entries will be sorted horizontal.
+
+    Possible values:        {0,1}
+    Default:                0
+
+                                              *g:leaderGuide_display_plus_menus*
+g:leaderGuide_display_plus_menus~
+    Displays menus (groups) with a "+" in-front of the description. Off by default.
 
     Possible values:        {0,1}
     Default:                0
@@ -385,15 +351,32 @@ g:leaderGuide_sort_horizontal~
                                               *g:leaderGuide_default_group_name*
 g:leaderGuide_default_group_name~
     Allows to set a default group name. This name is shown as group
-    description when the configuration dictionary has no corrosponding entry.
+    description when the configuration dictionary has no corresponding entry.
 
     Example:
 >
-    let g:leaderGuide_default_group_name = "+group"
+    let g:leaderGuide_default_group_name = "group"
 <
 
     Possible values:        {String}
     Default:                "" (Empty String)
+
+
+                                                     *g:leaderGuide_match_whole*
+g:leaderGuide_match_whole~
+    Allow for multi-key mappings where the root (all but last character) of a
+    mapping is a different function.
+
+    Setting this will also mean that incorrect keys entered before the mapping will
+    be read, leading to no function being executed if incorrect keys are pressed.
+
+    When off (the default) incorrect key presses will be ignored.
+
+    If you need functions for one key, say `m` and then also `mr` this should be 
+    set to `1`. Otherwise it is recommended to leave off.
+
+    Possible values:        {0,1}
+    Default:                0
 
 
                                               *g:leaderGuide_run_map_on_popup*
@@ -437,9 +420,12 @@ g:leaderGuide_flatten~
         when under normal behaviour the [ss] mapping would be displayed as
         [s] in the [s] subgroup.
 
-
     Note: With this option set to 0 mappings of the above type are not
     displayed correctly. Only the longest mappings will appear in the guide.
+
+    Note: If using this kind of multi-key mappings where the root maps to a 
+    different function you will need to set |g:leaderGuide_match_whole| to 
+    be able to select them.
 
     Possible values:        {0,1}
     Default:                1
@@ -450,7 +436,7 @@ g:leaderGuide_flatten~
 g:leaderGuide_displayfunc~
     Sets a function to call on all for every displaystring in the guide
     buffer.
-    
+
     Inside of the function |g:leaderGuide#displayname| is available as the
     string to display for the current mapping. It can be manipulated by
     the function.
@@ -460,7 +446,7 @@ g:leaderGuide_displayfunc~
     function! s:my_displayfunc()
         let g:leaderGuide#displayname =
         \ substitute(g:leaderGuide#displayname, '\c<cr>$', '', '')
-        let g:leaderGuide#displayname = 
+        let g:leaderGuide#displayname =
         \ substitute(g:leaderGuide#displayname, '^<Plug>', '', '')
     endfunction
     let g:leaderGuide_displayfunc = [function("s:my_displayfunc")]
@@ -501,6 +487,24 @@ g:leaderGuide_displayfunc~
     endfunction
 <
 
+                                                  *g:leaderGuide_key_name_map*
+g:leaderGuide_key_name_map~
+    Remap how keys are displayed in the leader guide.
+
+    Example:
+    To change the display name for the key `b`:
+    >
+    g:leaderGuide_key_name_map = {'b': 'custom'}
+<
+
+    Possible values:        {dict} of key display mappings
+    Default: >
+    { '<C-I>': '<Tab>',
+    \  '<C-H>': '<BS',
+    \  ' ': 'SPC'
+    \ }
+<
+
                                                    *g:leaderGuide#displayname*
 g:leaderGuide#displayname~
     This variable is set to the displayname (The string that will show up in
@@ -539,7 +543,7 @@ g:leaderGuide_submode_mappings~
 
     Paging example: >
 
-        let g:leaderGuide_submode_mappings = 
+        let g:leaderGuide_submode_mappings =
           \ { '<C-C>: 'win_close', '<C-F>': 'page_down', '<C-B>': 'page_up'}
 <
     Page down with <C-C><C-F>, page up with <C-C><C-B>.
@@ -556,6 +560,7 @@ g:leaderGuide_submode_mappings~
 ==============================================================================
 CHANGELOG                                               *leader-guide-changelog*
 
+    2020-12-14:     - Docs updated to reflect all fork changes
     2016-11-06:     - Add paging function.
                       (See |g:leaderGuide_max_size| and
                       |g:leaderGuide_submode_mappings|)
