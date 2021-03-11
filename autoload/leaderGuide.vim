@@ -343,20 +343,65 @@ function! s:wait_for_input() " {{{
 endfunction " }}}
 
 function! s:winopen() " {{{
-  let s:bufnr = nvim_create_buf(v:false, v:false)
+
   let vert = g:leaderGuide_vertical
-  let left = (g:leaderGuide_position[3:] ==? 'left')
-  let top = (g:leaderGuide_position[:2] ==? 'top')
-  call nvim_open_win(s:bufnr, v:true, {'relative' : 'editor', 'style' : 'minimal',
-        \'anchor' : (vert ? (left ? 'NW' : 'NE') : (top ? 'NW' : 'SW')), 
-        \'row' : ((!vert && !top) ? &lines : 0), 'col' : ((vert && !left) ? &columns : 0), 
-        \'width': &columns, 'height' : &lines})
+
+  if exists('*popup_create')
+
+    let a:position = g:leaderGuide_position
+    let s:bufnr = bufadd('Leader-Guide')
+
+    let guidewinid = popup_create(s:bufnr, {
+    \ 'pos': a:position,
+    \ 'border': [],
+    \ 'borderchars': ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
+    \ 'padding': [0,1,0,1],
+    \ })
+
+  else
+
+    let left = (g:leaderGuide_position[3:] ==? 'left')
+    let top = (g:leaderGuide_position[:2] ==? 'top')
+    let s:bufnr = nvim_create_buf(v:false, v:false)
+
+    call nvim_open_win(s:bufnr, v:true, {
+          \'relative' : 'editor',
+          \'style' : 'minimal',
+          \'anchor' : (vert ? (left ? 'NW' : 'NE') : (top ? 'NW' : 'SW')), 
+          \'row' : ((!vert && !top) ? &lines : 0),
+          \'col' : ((vert && !left) ? &columns : 0), 
+          \'width': &columns,
+          \'height' : &lines
+          \})
+
+  endif
+
   let s:gwin = winnr()
   let s:layout = s:calc_layout()
   noautocmd execute (g:leaderGuide_vertical ? 'vert res ' : 'res ') s:layout.win_dim
   setlocal filetype=leaderGuide nobuflisted buftype=nofile bufhidden=unload noswapfile
-  setlocal winfixwidth winfixheight winhighlight=Normal:LeaderGuideFloating
+  setlocal winfixwidth winfixheight
+  if has('nvim')
+    setlocal winhighlight=Normal:LeaderGuideFloating
+  endif
+
 endfunction " }}}
+
+"function! s:winopen() " {{{
+"  let s:bufnr = nvim_create_buf(v:false, v:false)
+"  let vert = g:leaderGuide_vertical
+"  let left = (g:leaderGuide_position[3:] ==? 'left')
+"  let top = (g:leaderGuide_position[:2] ==? 'top')
+"  call nvim_open_win(s:bufnr, v:true, {'relative' : 'editor', 'style' : 'minimal',
+"        \'anchor' : (vert ? (left ? 'NW' : 'NE') : (top ? 'NW' : 'SW')), 
+"        \'row' : ((!vert && !top) ? &lines : 0), 'col' : ((vert && !left) ? &columns : 0), 
+"        \'width': &columns, 'height' : &lines})
+"  let s:gwin = winnr()
+"  let s:layout = s:calc_layout()
+"  noautocmd execute (g:leaderGuide_vertical ? 'vert res ' : 'res ') s:layout.win_dim
+"  setlocal filetype=leaderGuide nobuflisted buftype=nofile bufhidden=unload noswapfile
+"  setlocal winfixwidth winfixheight winhighlight=Normal:LeaderGuideFloating
+"endfunction " }}}
 
 function! s:winclose() " {{{
   if s:gwin == winnr()
