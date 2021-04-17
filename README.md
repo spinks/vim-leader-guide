@@ -40,7 +40,7 @@ let g:lmap = {}
 nnoremap <leader>s :up<CR>
 let g:lmap.s = 'save file'
 
-" A command with a non-standard key
+" A command with a special (<...>) key
 nnoremap <leader><Tab> :call feedkeys(":")<CR>
 let g:lmap['<Tab>'] = 'cmd'
 
