@@ -23,11 +23,15 @@ This fork of `hecal3/vim-leader-guide` fixes issues and introduces many new feat
 
 For manual installation copy this repository somewhere and add its path to the neovim runtimepath.
 
-## Example Usage
-For more detailed description of available commands and functions, and more configuration recommendations see the documentation.
+## Minimal Configuration
+With no nammed mappings the leader guide can still be displayed.
+```vim
+let mapleader = '\<Space>'
+nnoremap <silent> <leader> :<c-u>LeaderGuide '<Space>'<CR>
+vnoremap <silent> <leader> :<c-u>LeaderGuideVisual '<Space>'<CR>
+```
 
-Plugin configuration makes use of vim script's dictionary structures.
-
+To provide names a dictionary configuration is needed.
 ```vim
 " Define prefix dictionary
 let g:lmap = {}
@@ -36,113 +40,90 @@ let g:lmap = {}
 nnoremap <leader>s :up<CR>
 let g:lmap.s = 'save file'
 
-" Define a group
+" To define a group create a dictionary with the special 'name' field
 let g:lmap.b = {'name' : 'buffers'}
-" Create a dictionary with the special 'name' field
 
 " A mapping within a group
 nnoremap <leader>bl :ls<CR>
 let g:lmap.b.l = 'list'
-```
 
----
+let mapleader = '\<Space>'
+" Register the dictionary with leader guide
+call leaderGuide#register_prefix_descriptions("<Space>", "g:lmap")
+nnoremap <silent> <leader> :<c-u>LeaderGuide '<Space>'<CR>
+vnoremap <silent> <leader> :<c-u>LeaderGuideVisual '<Space>'<CR>
+```
 
 ## Mappings
 
 Mappings can be defined in three ways.
 
 #### Recommended
-- Set the mapping in vim as you would normally
-    - `nnoremap <leader>s :up<CR>`
-- Give the mapping a name in the leader guide dict (this is optional, it will otherwise display the raw command (ex. `:up`))
-    - `let g:lmap.s = 'save file'`
+```vim
+" Set the mapping in vim as you would normally
+nnoremap <leader>s :up<CR>
+" Give the mapping a name in the leader guide dict (optional: otherwise displaying the raw command (eg. :up))
+let g:lmap.s = 'save file'
+```
 
 This method gives more flexibility over the mappings, means that all mappings that you make can be executed without waiting for the leader menu pop up.
 
-This behaviour is also dictated and encouraged by the setting `g:leaderGuide_mode_local_only` which is set to `1`, enabled, by default. This means that only mappings which are available in vim (map, nmap, vmap) are displayed in the leader guide. This also helps in that mappings which are buffer local (filetype dependent) are only shown when in that filetype.
+This behaviour is encouraged by `g:leaderGuide_mode_local_only` which is enabled by default. This means that only mappings which are available in vim (map, nmap, vmap) are displayed in the leader guide. This also means that mappings which are buffer local (filetype dependent) are only shown when in that filetype.
 
 If you have the setting `g:leaderGuide_mode_local_only` disabled and have an entry in the dict defined by this method and not the list method described below you will encounter errors (it will execute the second character in the string, which is not desired).
 
 #### Two Older Styles
-##### One
-- You can optionally set the mapping in vim
-    - However, if you want the command to be available in the dict without setting the mapping in vim you need to set `g:leaderGuide_mode_local_only` to `0`, to show unmapped dict entries
-- Give the mapping a name in the leader guide dict with the array method ([command, description])
-    - `let g:lmap.s = ['up', 'save file']`
-
-As mentioned this is less expressive, if you only have the mapping in the dict and not vim it will not be executable without waiting for the leader guide and you have to be able to wrap your mapping in quotes, which can sometimes be difficult.
-
-Native vim mappings will always take precedence over dictionary-only mappings defined in this method.
-
-##### Two
-Depending on your use case extensive dictionary configuration may not be necessary.
-
-Instead of
+##### Dictionary-Only Mappings
+You can optionally set the mapping in vim, but you will have to disable `g:leaderGuide_mode_local_only` to show unmapped entries.
 ```vim
-    nmap <silent> <leader>fd :e $MYVIMRC<CR>
-    let g:lmap.f.d = ['e $MYVIMRC', 'Open vimrc']
+let g:leaderGuide_mode_local_only = 0
+let g:lmap.s = ['up', 'save file']
 ```
 
-One could simply use:
+This method less expressive, you have to wait for the leader guide to execute dictionary-only mappings and you have to be able to wrap your function in quotes, which can sometimes be difficult. Native vim mappings will take precedence over dictionary-only mappings.
+
+##### Plug Statements
+You can use `<Plug>` statements to "name" mappings.
+
 ```vim
-    nnoremap <Plug>(open-vimrc) :e $MYVIMRC<CR>
-    nmap <leader>fd <Plug>(open-vimrc)
+nnoremap <Plug>(open-vimrc) :e $MYVIMRC<CR>
+nmap <leader>fd <Plug>(open-vimrc)
 ```
 
-This variant could be considered less intrusive.
-This way the dictionary need only contain the group names.
-
-It is also possible to hide the `<Plug>`-prefix and run other arbitrary functions like a custom search/replace or a simple value lookup on the display-name.
-
-Consult the docs under **g:leaderGuide_displayfunc**
+This way the dictionary need only contain the group names. It is also possible to hide the `<Plug>`-prefix and run other arbitrary functions like a custom search/replace or a simple value lookup on the display-name. Consult the docs under **g:leaderGuide_displayfunc**
 
 ## Registering the Dictionary
 
-To make the guide pop up Register the description dictionary for the prefix first
-(Assuming Space is your leader):
-
+You then need to register the mapping dictionary with leader guide.
 ```vim
+let mapleader = '\<Space>'
 call leaderGuide#register_prefix_descriptions("<Space>", "g:lmap")
 nnoremap <silent> <leader> :<c-u>LeaderGuide '<Space>'<CR>
 vnoremap <silent> <leader> :<c-u>LeaderGuideVisual '<Space>'<CR>
 ```
 
-The guide will be up to date at all times.
-
-It is possible to call the guide for keys other than `leader`:
-
+It is possible to call the guide for keys other than `leader`.
 ```vim
+
+let g:llmap = {}
+" a filetype conditional group-name
+autocmd FileType tex let g:llmap.l = { 'name' : 'vimtex' }
+
+let maplocalleader = ','
+call leaderGuide#register_prefix_descriptions(",", "g:llmap")
 nnoremap <localleader> :<c-u>LeaderGuide  ','<CR>
 vnoremap <localleader> :<c-u>LeaderGuideVisual  ','<CR>
-" This variant won't have any group names.
-
-" Group names can be defined by filetype. Add the following lines:
-let g:llmap = {}
-autocmd FileType tex let g:llmap.l = { 'name' : 'vimtex' }
-call leaderGuide#register_prefix_descriptions(",", "g:llmap")
-" to name the <localleader>-n group vimtex in tex files.
 ```
 
----
+After pressing `leader` the guide buffer will pop up when there are no further keystrokes within `timeoutlen`. Pressing other keys within `timeoutlen` will either complete the mapping or open a subgroup.
 
-The dictionary configuration is necessary however, to provide group names or a description text.
-
-After pressing `leader` the guide buffer will pop up when there are no further keystrokes within `timeoutlen`.
-
-Pressing other keys within `timeoutlen` will either complete the mapping or open a subgroup.
-In the example above `leader-b` will open up the buffer menu.
-
-Please note that no matter which mappings and menus you configure, your original leader mappings will remain unaffected.
-The key guide is an additional layer. It will only activate, when you do not complete your input during the timeoutlen duration.
+Note that no matter which mappings and menus you configure, original leader mappings will remain unaffected. The leader guide is an additional layer. It will only activate, when you do not complete your input during the timeoutlen duration.
 
 ## Display mappings without prefix
 
 Additionally it is possible to display all buffer local mappings with `<Plug>leaderguide-buffer`.
 
-This feature is useful to explore mappings defined by plugins in their respective buffers. (fugitive, tagbar, vimfiler, Nerdtree, etc.)
-To make the usage of `<Plug>leaderguide-buffer'` in those plugin buffers more convenient one can make use of autocommands.
-
-Examples:
+This feature is useful to explore mappings defined by plugins in their respective buffers. (fugitive, tagbar, vimfiler, Nerdtree, etc.) To make the usage of `<Plug>leaderguide-buffer'` in those plugin buffers more convenient one can make use of autocommands.
 
 ```vim
 autocmd FileType gitcommit  noremap <buffer> <leader> <Plug>leaderguide-buffer
@@ -151,7 +132,6 @@ autocmd FileType gitcommit  noremap <buffer> <leader> <Plug>leaderguide-buffer
 autocmd BufEnter __Tagbar__  noremap <buffer> <leader> <Plug>leaderguide-buffer
 " for tagbar
 ```
-
 
 To open a guide showing not only the buffer-local but all mappings use `<Plug>leaderguide-global`
 
@@ -165,50 +145,28 @@ let g:topdict[','] = g:llmap
 let g:topdict[',']['name'] = '<localleader>'
 
 call leaderGuide#register_prefix_descriptions("", "g:topd")
-
-" Remove the old prefixes
-"call leaderGuide#register_prefix_descriptions(",", "g:llmap")
-"call leaderGuide#register_prefix_descriptions("<Space>", "g:lmap")
 ```
 
 This configuration will provide access to the `leader` and `localleader` spaces when calling with `<Plug>leaderguide-global`
-
-Note: If the user does no configuration on their own the following default is set:
-
-```vim
-let g:leaderGuide_map = {}
-call leaderGuide#register_prefix_descriptions('', 'g:leaderGuide_map')
-```
-
-It's possible to simply reuse this dictionary and enter own configuration.
 
 
 ## Configuration settings
 ### Hiding Mappings
 
-It is now possible to hide mappings from the leader guide menu, while they are still executable from within the leader menu.
+It is possible to hide mappings from the leader guide menu, while they are still executable.
 
 ```vim
 let g:lmap.w = 'leader_ignore'
 ```
 
-`leader_ignore` is the reserved keyword to hide from the menu.
-
-This is useful for instance if you have a set of mappings to navigate between window numbers but do not want them all to clutter your leader guide.
+`leader_ignore` is the reserved keyword to hide from the menu. This is useful for instance if you have a set of mappings to navigate between window numbers but do not want them all to clutter your leader guide.
 
 ### Mapping key names
 
-It is possible to remap a key name to a different display name through the dictionary variable `g:leaderGuide_key_name_map`.
+It is possible to remap a key name to a different display name through setting the dictionary variable `g:leaderGuide_key_name_map`.
     - i.e. if one wanted to change the display name for the key `'b'` for whatever reason you would set `g:leaderGuide_key_name_map = {'b': 'custom'}`
 
-The default dict included remaps the following keys to their respective display names:
-```vim
-{
-    '<C-I>': '<Tab>',
-    '<C-H>': '<BS',
-    ' ': 'SPC'
-}
-```
+If not defined leader guide remaps the following keys to the following respective display names: `<C-I>`: `<Tab>`, `<C-H>`: `<BS>`, `' '`: `SPC`.
 
 ### Match whole mapping
 Setting the variable `g:leaderGuide_match_whole` to `1` allows for multi-key mappings where the root (all but last characters) of the multi-key mapping is a second function, however it also means that incorrect keys entered before the mapping will be read, meaning that there will be no function called. Alternatively leaving it as `0` (the default) will mean that it will only try and match the last key, allowing for incorrect key presses leading up to the correct key.
@@ -218,16 +176,13 @@ Setting the variable `g:leaderGuide_match_whole` to `1` allows for multi-key map
 #### Floating Windows
 vim-leader-guide now makes use of neovim's floating windows API by default (vim popup window compatibility to be added).
 
-With this change the styling may be affected, this is due to the default highlight style for floating windows (`NormalFloat`) potentially being different to normal.
-vim-leader-guide uses this highlighting as default behaviour to avoid confusion.
-To change the styling simply link the `LeaderGuideFloating` highlight to any other, for example, to go back to the old style do:
+With this change the styling may be affected, this is due to the default highlight style for floating windows (`NormalFloat`) potentially being different to normal. vim-leader-guide uses this highlighting as default behaviour to avoid confusion. To change the styling simply link the `LeaderGuideFloating` highlight to any other, for example, to go back to the old style do:
 ```vim
 hi def link LeaderGuideFloating Normal
 ```
 
 #### Positional
 Popup position and orientation:
-
 ```vim
 " Horizontal modes (default)
 let g:leaderGuide_vertical = 0
@@ -255,27 +210,15 @@ let g:leaderGuide_vertical = 1
 ```
 
 Minimum horizontal space between columns:
-
 ```vim
 let g:leaderGuide_hspace = 5
 ```
 
 #### Menus
-Display menus with a "+" in-front of the description (à la emacs-which-key). Off by default. This also has custom syntax highlighting for menus when enabled.
-
+Display menus with a "+" in-front of the name. Off by default. This also has custom syntax highlighting when enabled.
 ```vim
 let g:leaderGuide_display_plus_menus = 0
 ```
-
-### Guide Updating
-Don't update the guide automatically: (Not recommended)
-
-```vim
-let g:leaderGuide_run_map_on_popup = 0
-```
-
-The update is almost instantaneous and will only run when the guide actually pops up. Apart from that the automatic update has no performance impact.
-
 
 ## Development Notes
 <details>
@@ -307,7 +250,3 @@ The update is almost instantaneous and will only run when the guide actually pop
 - Make use of neovim's floating windows
   - Allow aligning mappings to top or bottom in vertical window modes
 </details>
-
-#### Todos
-- ~~Update docs~~
-- ~~Add syntax highlighting for menu names when `g:leaderGuide_display_plus_menus` is enabled~~
