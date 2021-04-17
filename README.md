@@ -40,6 +40,10 @@ let g:lmap = {}
 nnoremap <leader>s :up<CR>
 let g:lmap.s = 'save file'
 
+" A command with a non-standard key
+nnoremap <leader><Tab> :call feedkeys(":")<CR>
+let g:lmap['<Tab>'] = 'cmd'
+
 " To define a group create a dictionary with the special 'name' field
 let g:lmap.b = {'name' : 'buffers'}
 
