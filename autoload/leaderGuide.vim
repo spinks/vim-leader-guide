@@ -300,7 +300,7 @@ function! s:start_buffer() " {{{
   let l:string_arr = s:create_string(s:layout)
   let l:start = 0
   if g:leaderGuide_vertical && (g:leaderGuide_position[:2] ==? 'bot')
-    call nvim_buf_set_lines(s:bufnr, 0, -1, 0, repeat([''], winheight(0) + 1 - &cmdheight))
+    call nvim_buf_set_lines(s:bufnr, 0, -1, 0, repeat([''], winheight(0) - &cmdheight))
     let l:start = -len(l:string_arr)-1
   endif
   call nvim_buf_set_lines(s:bufnr, l:start, -1, 0, l:string_arr)
